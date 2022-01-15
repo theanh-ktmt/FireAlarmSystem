@@ -1,0 +1,16 @@
+{
+  "name": "firealarmsystem-server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "morgan": "~1.9.1",
+    "mqtt": "^4.3.4",
+    "mysql": "^2.18.1"
+  }
+}
