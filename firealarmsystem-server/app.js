@@ -4,13 +4,18 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 var mqttUtils = require('./mqtt_utils')
+var mqttInfo = require('./config.json').MQTTBrokerInfo
 
 // Import HTTP route
-var indexRouter = require('./routes/index')
-var usersRouter = require('./routes/users')
+var indexController = require('./routes/index')
+const userController = require('./routes/user')
 
+// Khởi tạo express
 var app = express()
 var port = process.env.PORT || '9999'
+
+// Tạo MQTT Client
+const mqttClient = mqttUtils.getMQTTClient()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -24,21 +29,78 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // HTTP route
-app.use('/', indexRouter)
-app.use('/users', usersRouter)
+indexController(app, mqttClient)
+userController(app, mqttClient)
 
 // MQTT connection
+// Thông tin topic
+const dataTopic = mqttInfo.dataTopic
+const commandTopic = mqttInfo.commandTopic
 
-// Tạo MQTT Client
-const mqttClient = mqttUtils.getMQTTClient()
-
-// Đăng ký và gửi dữ liệu tới các topic
+// Đăng ký và nhận dữ liệu từ sensor trên data topic
+mqttClient.on('connect', () => {
+  console.log(`Connected to Broker ${mqttInfo.host} port ${mqttInfo.port}`)
+  mqttClient.subscribe([dataTopic], () => {
+    console.log(`Subscribed to topic ${dataTopic}`);
+  })
+})
 
 // Xử lý dữ liệu gửi tới
 mqttClient.on('message', function(topic, payload){
-  console.log(`Receive a message from topic $topic}\nPayload: ${payload}\n\n`);
+  // Tiếp nhận dữ liệu gửi tới
+  if(topic == mqttInfo.dataTopic){
+    // Lấy dữ liệu
+    const data = JSON.parse(payload.toString())
 
-  // Xử lý
+    const cardid = + data['cardid']
+    const temp = + data['temperature']
+    const humi = + data['humidity']
+    const fire = + data['fire']
+    const gas = + data['gas']
+    console.log(`Recieve data from ${cardid}: \n\t- Temperature: \t${temp}\n\t- Humidity: \t${humi}\n\t- Fire: \t${fire}\n\t- Gas: \t\t${gas}\n`);
+
+    // Đánh giá độ nguy hiểm theo độ ưu tiên fire > gas > temp and humi
+    var response = {};
+    response['type'] = "warning"
+    response['cardid'] = cardid
+
+    if(humi < 50){
+      response['danger'] = 'DRY!'
+    }
+
+    if(temp > 32){
+      response['danger'] = 'TOO HOT!'
+    }
+
+    if(gas > 300){
+      response['hasGas'] = 1
+      response['danger'] = 'GAS LEAK!'
+    }
+    else{
+      response['hasGas'] = 0
+    }
+
+    if(fire < 200){
+      response['hasFire'] = 1
+      response['danger'] = "FIRE!"
+    }
+    else{
+      response['hasFire'] = 0
+    }
+
+    if(!response['danger']){
+      response['danger'] = "No danger"
+    }
+
+    // Gửi lại dữ liệu vào kênh command
+    mqttClient.publish(commandTopic, JSON.stringify(response), {qos: 0, retain: false}, (error) => {
+      if(error){
+        console.error(error)
+      }
+
+      console.log(`Send result to topic ${mqttInfo.commandTopic}\n\t- Has fire: \t${response['hasFire']}\n\t- Has gas: \t${response['hasGas']}\n\t- Danger: \t${response['danger']}\n`);
+    })
+  }
 })
 
 app.listen(port, function(){

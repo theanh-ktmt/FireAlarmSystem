@@ -1,13 +1,15 @@
 {
     "databaseInfo": {
         "host": "localhost",
-        "username": "root",
+        "user": "root",
         "password": "123456",
         "database": "fire_alarm_system"
     },
     "MQTTBrokerInfo": {
         "host": "broker.hivemq.com",
         "port": 1883,
-        "clientId": "popcorn_mqtt_fas_server"
+        "clientId": "popcorn_mqtt_fas_server",
+        "dataTopic": "popcorn_mqtt_fas_data",
+        "commandTopic": "popcorn_mqtt_fas_command"
     }
 }

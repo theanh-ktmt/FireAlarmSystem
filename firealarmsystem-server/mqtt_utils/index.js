@@ -4,7 +4,7 @@ const brokerInfo = require('../config.json').MQTTBrokerInfo
 module.exports = {
     clientId: brokerInfo.clientId,
     getMQTTConnectionURL: function(){
-        return `mqttL//${brokerInfo.host}:${brokerInfo.port}`
+        return `mqtt://${brokerInfo.host}:${brokerInfo.port}`
     },
     getMQTTClient: function(){
         const client = mqtt.connect(this.getMQTTConnectionURL(), {

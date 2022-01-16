@@ -8,8 +8,7 @@ module.exports = {
             user: dbConfig.user, 
             password: dbConfig.password, 
             database: dbConfig.database,
-            multipleStatements: true,
-            insecureAuth: true
+            multipleStatements: true
         })
 
         connection.connect()
