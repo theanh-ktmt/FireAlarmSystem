@@ -386,95 +386,107 @@ void loop() {
       Id += myID[i] * pow(256, i);
     }
 
-    // Cấu hình ID cho lần quẹt thẻ đầu tiên
-    if(!fixId) fixId = Id;
+    // Nếu đây là lần quẹt đầu tiên
+    // hoặc mã thẻ chính xác (giống với mã đã cấu hình)
+    if(!fixId || Id == fixId){
+      // Gửi card ID lên server để đăng nhập
+      JSONVar json;
+      json["code"] = Id;
+  
+      HTTPClient http;
+      String path = serverAddr + "/loginFromHome";
+      http.begin(path.c_str());
+      http.addHeader("Content-Type", "application/json");
+      int resCode = http.POST(JSON.stringify(json));
+  
+      JSONVar response;
+      if(resCode == 200){ // Thành công
+        String payload = http.getString();
+        response = JSON.parse(payload);
+  
+        // Đăng nhập thành công
+        if((String) ((const char*) response["status"]) == "success"){
+          String username = (String) ((const char*) response["userInfo"]["name"]);
+          Serial.println(response["message"]);
+          Serial.print("Username: ");
+          Serial.println(username);
 
-    // Gửi card ID lên server để đăng nhập
-    JSONVar json;
-    json["code"] = Id;
-
-    HTTPClient http;
-    String path = serverAddr + "/loginFromHome";
-    http.begin(path.c_str());
-    http.addHeader("Content-Type", "application/json");
-    int resCode = http.POST(JSON.stringify(json));
-
-    JSONVar response;
-    if(resCode == 200){ // Thành công
-      String payload = http.getString();
-      response = JSON.parse(payload);
-
-      // Đăng nhập thành công
-      if((String) ((const char*) response["status"]) == "success"){
-        String username = (String) ((const char*) response["userInfo"]["name"]);
-        Serial.println(response["message"]);
-        Serial.print("Username: ");
-        Serial.println(username);
-        
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print("Correct UID!");
-        lcd.setCursor(0, 1);
-        lcd.print("Hello!!");
-        lcd.setCursor(3, 2);
-        lcd.print(username);
-
-        delay(2000);
-
-        isOn = 1 - isOn; // Đổi trạng thái
-
-        // Bật hệ thống
-        if(isOn){
-          Serial.println("Turning on ...");
+          // Cấu hình ID cho lần quẹt thẻ đầu tiên
+          if(!fixId) fixId = Id;
+          
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print("System is ready!");
-          lcd.setCursor(3, 1);
-          lcd.print("Running ...");
-          lcd.setCursor(5, 3);
-          lcd.print("Hello Boss!");
+          lcd.print("Correct UID!");
+          lcd.setCursor(0, 1);
+          lcd.print("Hello!!");
+          lcd.setCursor(3, 2);
+          lcd.print(username);
+  
+          delay(2000);
+  
+          isOn = 1 - isOn; // Đổi trạng thái
+  
+          // Bật hệ thống
+          if(isOn){
+            Serial.println("Turning on ...");
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("System is ready!");
+            lcd.setCursor(3, 1);
+            lcd.print("Running ...");
+            lcd.setCursor(5, 3);
+            lcd.print("Hello Boss!");
+          }
+  
+          // Tắt hệ thống
+          else{
+            Serial.println("Turning off ...");
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("System is stopped!");
+            lcd.setCursor(3, 1);
+            lcd.print("Turning off ...");
+            lcd.setCursor(5, 3);
+            lcd.print("Goodbye Boss!");
+  
+            delay(1000);
+  
+            lcd.clear();
+            lcd.setCursor(3, 1);
+            lcd.print("System is OFF!");
+            lcd.setCursor(4, 2);
+            lcd.print("Popcorn Team");
+          }
         }
-
-        // Tắt hệ thống
+  
+        // Đăng nhập thất bại
         else{
-          Serial.println("Turning off ...");
+          Serial.println(response["message"]);
           lcd.clear();
-          lcd.setCursor(0, 0);
-          lcd.print("System is stopped!");
-          lcd.setCursor(3, 1);
-          lcd.print("Turning off ...");
-          lcd.setCursor(5, 3);
-          lcd.print("Goodbye Boss!");
-
-          delay(1000);
-
-          lcd.clear();
-          lcd.setCursor(3, 1);
-          lcd.print("System is OFF!");
-          lcd.setCursor(4, 2);
-          lcd.print("Popcorn Team");
+          lcd.setCursor(5, 1);
+          lcd.print("Wrong UID!");
+          lcd.setCursor(2, 2);
+          lcd.print("Please try again!");
         }
       }
-
-      // Đăng nhập thất bại
       else{
-        Serial.println(response["message"]);
+        changeLedState("blue");
+        Serial.println("Server is not responding!");
         lcd.clear();
-        lcd.setCursor(5, 1);
-        lcd.print("Wrong UID!");
+        lcd.setCursor(2, 1);
+        lcd.print("Not responding!");
         lcd.setCursor(0, 2);
         lcd.print("Please try again!");
       }
     }
-    else{
-      changeLedState("blue");
-      Serial.println("Server is not responding!");
+    else {
+      Serial.println("Your ID does not match with system ID!");
       lcd.clear();
-      lcd.setCursor(2, 1);
-      lcd.print("Not responding!");
-      lcd.setCursor(0, 2);
+      lcd.setCursor(5, 1);
+      lcd.print("Wrong UID!");
+      lcd.setCursor(2, 2);
       lcd.print("Please try again!");
-    }
+    }    
 
     delay(1000);
     return;

@@ -9,6 +9,8 @@ var mqttInfo = require('./config.json').MQTTBrokerInfo
 // Import HTTP route
 var indexController = require('./routes/index')
 const userController = require('./routes/user')
+const database = require('./database')
+const utils = require('./utils')
 
 // Khởi tạo express
 var app = express()
@@ -53,10 +55,11 @@ mqttClient.on('message', function(topic, payload){
     const data = JSON.parse(payload.toString())
 
     const cardid = + data['cardid']
-    const temp = + data['temperature']
-    const humi = + data['humidity']
+    const temp = (+ data['temperature']).toFixed(2)
+    const humi = (+ data['humidity']).toFixed(2)
     const fire = + data['fire']
     const gas = + data['gas']
+    console.log('------------------------------------')
     console.log(`Recieve data from ${cardid}: \n\t- Temperature: \t${temp}\n\t- Humidity: \t${humi}\n\t- Fire: \t${fire}\n\t- Gas: \t\t${gas}\n`);
 
     // Đánh giá độ nguy hiểm theo độ ưu tiên fire > gas > temp and humi
@@ -91,6 +94,17 @@ mqttClient.on('message', function(topic, payload){
     if(!response['danger']){
       response['danger'] = "No danger"
     }
+
+    // Lưu dữ liệu xuống CSDL
+    const conn = database.createConnection()
+
+    // Lưu trữ vào CSDL
+    conn.query('insert into environment_state(cardid, temperature, humidity, fire, gas, thoigian) values (?, ?, ?, ?, ?, ?)', [cardid, temp, humi, fire, gas, utils.getCurrentDateString()], function(err, results){
+      if(err) throw err
+
+      console.log("Saved data to database.\n")
+      conn.end()
+    })
 
     // Gửi lại dữ liệu vào kênh command
     mqttClient.publish(commandTopic, JSON.stringify(response), {qos: 0, retain: false}, (error) => {
