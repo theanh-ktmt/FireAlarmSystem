@@ -28,8 +28,8 @@
                     </div>
     
                     <div class="content-left-user-info">
-                        <h1>Trần Thế Anh</h1>
-                        <p>Mã số thẻ: <span style="color: deepskyblue;">12345678</span></p>
+                        <h1><%= username %></h1>
+                        <p>Mã số thẻ: <span style="color: deepskyblue; font-weight: bold;"><%= cardid %></span></p>
                     </div>
                 </div>
 
@@ -38,35 +38,46 @@
                     <div class="content-left-env-info-items row">
                         <div class="content-left-env-info-item">
                             <p>Nhiệt độ</p>
-                            <h1>25<span>&ordm;C</span></h1>
+                            <h1><%= curState['temperature'] %><span>&ordm;C</span></h1>
                         </div>
 
                         <div class="content-left-env-info-item">
                             <p>Độ ẩm</p>
-                            <h1>70<span>%</span></h1>
+                            <h1><%= curState['humidity'] %><span>%</span></h1>
                         </div>
 
                         <div class="content-left-env-info-item">
                             <p>Lửa</p>
-                            <h1>0</h1>
+                            <h1><%= curState['fire'] %></h1>
                         </div>
 
                         <div class="content-left-env-info-item">
                             <p>Khí gas</p>
-                            <h1>0</h1>
+                            <h1><%= curState['gas'] %></h1>
                         </div>
                     </div>
 
                     <div class="content-left-env-info-status">
-                        <p><i class="fas fa-exclamation-circle"></i> Cảnh báo: <span>An toàn</span></p>
+                        <% if(curState.warning == 'An toàn'){ %>
+                            <p><i class="fas fa-exclamation-circle"></i> Cảnh báo: <span style="color: limegreen;"><%= curState.warning %></span></p>
+                        <% } else if(curState.warning == 'Không rõ') { %>
+                            <p><i class="fas fa-exclamation-circle"></i> Cảnh báo: <span style="color: deepskyblue;"><%= curState.warning %></span></p>
+                        <% } else { %>
+                            <p><i class="fas fa-exclamation-circle"></i> Cảnh báo: <span style="color: red;"><%= curState.warning %></span></p>
+                        <% } %>
                     </div>
                 </div>
 
                 <div class="content-left-control">
                     <h1>Bảng điều khiển</h1>
                     <div class="content-left-control-body">
-                        <p><i class="fas fa-check-circle"></i> Trạng thái: <span>Bật</span></p>
-                        <button><i class="fas fa-power-off"></i> Tắt hệ thống</button>
+                        <% if(systemState){ %>
+                            <p><i class="fas fa-check-circle"></i> Trạng thái: <span style="color: limegreen;">Bật</span></p>
+                            <button onclick="turnOff()"><i class="fas fa-power-off"></i> Tắt hệ thống</button>
+                        <% } else { %>
+                            <p><i class="fas fa-check-circle"></i> Trạng thái: <span style="color: red;">Tắt</span></p>
+                            <button onclick="turnOn()"><i class="fas fa-power-off"></i> Bật hệ thống</button>
+                        <% } %>
                     </div>
                 </div>
 
@@ -75,42 +86,43 @@
                     <div class="content-left-analyse-average">
                         <div class="content-left-analyse-average-header">
                             <p>Thông số trung bình ngày</p>
-                            <select>
-                                <option value="">18-01-2022</option>
-                                <option value="">17-01-2022</option>
-                                <option value="">16-01-2022</option>
-                                <option value="">15-01-2022</option>
-                                <option value="">14-01-2022</option>
-                            </select>
+                            <%  
+                                function dateToString(date){
+                                    return `${('0' + date.getDate()).slice(-2)}-${('0' + (date.getMonth() + 1)).slice(-2)}-${date.getFullYear()}`
+                                }
+                                const date = new Date()
+                                const dateString = dateToString(date)
+                            %>
+                            <span><%= dateString %></span>
                         </div>
                         
                         <div class="content-left-analyse-items row">   
                             <div class="content-left-analyse-item">
                                 <p>Nhiệt độ</p>
-                                <h1>25<span>&ordm;C</span></h1>
+                                <h1><%= avgState['temperature'] %><span>&ordm;C</span></h1>
                             </div>
     
                             <div class="content-left-analyse-item">
                                 <p>Độ ẩm</p>
-                                <h1>70<span>%</span></h1>
+                                <h1><%= avgState['humidity'] %><span>%</span></h1>
                             </div>
     
                             <div class="content-left-analyse-item">
                                 <p>Lửa</p>
-                                <h1>675</h1>
+                                <h1><%= avgState['fire'] %></h1>
                             </div>
     
                             <div class="content-left-analyse-item">
                                 <p>Khí gas</p>
-                                <h1>101</h1>
+                                <h1><%= avgState['gas'] %></h1>
                             </div>
                         </div>
                     </div>                    
                 </div>
 
                 <div class="content-left-bottom">
-                    <button><i class="fas fa-redo"></i> Làm mới</button>
-                    <button><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                    <button class="button-refresh"><i class="fas fa-redo"></i> Làm mới</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
                 </div>
             </div>
             <div class="content-right">

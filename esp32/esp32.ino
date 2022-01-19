@@ -58,6 +58,7 @@ int  fire, gas;
 // Topic
 String dataTopic = "popcorn_mqtt_fas_data";
 String commandTopic = "popcorn_mqtt_fas_command";
+String stateTopic = "popcorn_mqtt_fas_state";
 
 // Tham số khác
 // Mã thẻ đang dùng {0xA1, 0x3E, 0xBC, 0x1B}
@@ -99,6 +100,16 @@ void changeLedState(String state){
     digitalWrite(NORMAL_PIN, LOW);
     digitalWrite(ERR_PIN, HIGH);
   }
+}
+
+// Cập nhật trạng thái lên server
+void stateReport(int state){
+  Serial.print("Update trạng thái: ");
+  Serial.println(state);
+  JSONVar json;
+  json["cardid"] = fixId;
+  json["state"] = state;
+  mqttClient.publish(stateTopic.c_str(), JSON.stringify(json).c_str());
 }
 
 // Bật còi báo động
@@ -176,6 +187,9 @@ void callback(char* topic, byte* payload, unsigned int length){
         // Tín hiệu điều khiển khác với trạng thái hiện tại
         if(signal != isOn){
           isOn = signal;
+
+          // gửi cập nhật tới server
+          stateReport(isOn);
   
           // Xử lý
           if(isOn){
@@ -425,7 +439,10 @@ void loop() {
           delay(2000);
   
           isOn = 1 - isOn; // Đổi trạng thái
-  
+
+          // Báo cáo trạng thái mới lên server
+          stateReport(isOn);
+          
           // Bật hệ thống
           if(isOn){
             Serial.println("Turning on ...");

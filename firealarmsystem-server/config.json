@@ -10,6 +10,7 @@
         "port": 1883,
         "clientId": "popcorn_mqtt_fas_server",
         "dataTopic": "popcorn_mqtt_fas_data",
-        "commandTopic": "popcorn_mqtt_fas_command"
+        "commandTopic": "popcorn_mqtt_fas_command",
+        "stateTopic": "popcorn_mqtt_fas_state"
     }
 }

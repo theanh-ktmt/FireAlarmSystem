@@ -25,15 +25,30 @@ module.exports = function (app, mqttClient) {
     const conn = database.createConnection()
 
     // ... Truy vấn
-
-    conn.end()
-
-    res.send({
-      status: 'success',
-      message: 'Đăng nhập thành công',
-      userInfo: {
-        name: "Tran The Anh"
+    conn.query('select * from user where username = ? and password = ?', [username, password], function(err, results){
+      if(err) throw err
+      
+      // Tồn tại user
+      if(results.length > 0){
+        res.send({
+          status: 'success',
+          message: 'Đăng nhập thành công',
+          userInfo: {
+            id: results[0].id,
+            name: results[0].name
+          }
+        })
       }
+
+      // Không tồn tại user
+      else{
+        res.send({
+          status: 'fail',
+          message: 'Tài khoản không tồn tại!'
+        })
+      }
+
+      conn.end()
     })
   })
 
@@ -42,18 +57,41 @@ module.exports = function (app, mqttClient) {
     // Thông tin người dùng
     const username = req.body.username
     const password = req.body.password
-    const code = req.body.code
+    const cardid = utils.hexDecoder(req.body.cardid)
     const name = req.body.name
-    const avatar = req.body.avatar
 
     // Kiểm tra thông tin người dùng
-    const conn = createConnection()
+    const conn = database.createConnection()
 
-    // Kiểm tra thông tin tài khoản
-    // Nếu đúng, tạo tài khoản
-    // Nếu sai, báo lại client
+    // Kiểm tra xem thông tin người dùng đã tồn tại chưa
+    conn.query('select * from user where username = ? or cardid = ?', [username, cardid], function(err, results){
+      // Đã tồn tại tài khoản
+      if(results.length > 0){
+        res.send({
+          status: 'fail',
+          message: 'Tài khoản đã tồn tại'
+        })
 
-    conn.end()
+        console.log("Thêm thất bại");
+        conn.end()
+      }
+
+      // Tài khoản chưa tồn tại
+      else{
+        // Thêm tài khoản vào cơ sỏ dữ liệu
+        conn.query('insert into user(username, password, name, cardid) values (?, ?, ?, ?)', [username, password, name, cardid], function(err, results){
+          if(err) throw err
+
+          res.send({
+            status: 'success',
+            message: "Đăng ký thành công"
+          })
+
+          console.log("Thêm thành công");
+          conn.end()
+        })
+      }
+    })
   })
 
   // ---------------------- Phía phần cứng ------------------------------- //

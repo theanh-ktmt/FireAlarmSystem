@@ -38,18 +38,19 @@ userController(app, mqttClient)
 // Thông tin topic
 const dataTopic = mqttInfo.dataTopic
 const commandTopic = mqttInfo.commandTopic
+const stateTopic = mqttInfo.stateTopic
 
 // Đăng ký và nhận dữ liệu từ sensor trên data topic
 mqttClient.on('connect', () => {
   console.log(`Connected to Broker ${mqttInfo.host} port ${mqttInfo.port}`)
-  mqttClient.subscribe([dataTopic], () => {
-    console.log(`Subscribed to topic ${dataTopic}`);
+  mqttClient.subscribe([dataTopic, stateTopic], () => {
+    console.log(`Subscribed to topic ${dataTopic} and ${stateTopic}`);
   })
 })
 
 // Xử lý dữ liệu gửi tới
 mqttClient.on('message', function(topic, payload){
-  // Tiếp nhận dữ liệu gửi tới
+  // Nếu phần cứng gửi dữ liệu lên
   if(topic == mqttInfo.dataTopic){
     // Lấy dữ liệu
     const data = JSON.parse(payload.toString())
@@ -99,7 +100,7 @@ mqttClient.on('message', function(topic, payload){
     const conn = database.createConnection()
 
     // Lưu trữ vào CSDL
-    conn.query('insert into environment_state(cardid, temperature, humidity, fire, gas, thoigian) values (?, ?, ?, ?, ?, ?)', [cardid, temp, humi, fire, gas, utils.getCurrentDateString()], function(err, results){
+    conn.query('insert into environment_state(cardid, temperature, humidity, fire, gas, thoigian, warning) values (?, ?, ?, ?, ?, ?, ?)', [cardid, temp, humi, fire, gas, utils.getCurrentDateString(), response['danger']], function(err, results){
       if(err) throw err
 
       console.log("Saved data to database.\n")
@@ -112,7 +113,26 @@ mqttClient.on('message', function(topic, payload){
         console.error(error)
       }
 
-      console.log(`Send result to topic ${mqttInfo.commandTopic}\n\t- Has fire: \t${response['hasFire']}\n\t- Has gas: \t${response['hasGas']}\n\t- Danger: \t${response['danger']}\n`);
+      console.log(`Send result to topic ${commandTopic}\n\t- Has fire: \t${response['hasFire']}\n\t- Has gas: \t${response['hasGas']}\n\t- Danger: \t${response['danger']}\n`);
+    })
+  }
+
+  // Nếu phần cứng báo cáo thay đổi trạng thái
+  if(topic == stateTopic){
+    // Cập nhật trạng thái mới trên cơ sở dữ liệu
+    const data = JSON.parse(payload.toString())
+
+    // trạng thái mới của hệ thống
+    const newState = data.state
+    const cardid = + data.cardid
+
+    // Tạo kết nối CSDL
+    const conn = database.createConnection()
+    conn.query(`update system_state set state = ? where cardid = ?`, [newState, cardid], function(err, results){
+      if(err) throw err
+
+      console.log('Cập nhật thành công')
+      conn.end()
     })
   }
 })

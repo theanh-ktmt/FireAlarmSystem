@@ -22,5 +22,28 @@ module.exports = {
     getCurrentDateString: function(){
         const date = new Date()
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+    },
+    hexDecoder: function(str){
+        return parseInt(str.split('-').join(''), 16)
+    },
+    warningTranslater: function(danger){
+        if(danger == 'No danger'){
+            return 'An toàn'
+        }
+        else if(danger == 'FIRE!'){
+            return 'Có cháy!'
+        }
+        else if(danger == 'GAS LEAK!'){
+            return 'Rò rỉ khí gas!'
+        }
+        else if(danger == 'TOO HOT!'){
+            return 'Nhiệt độ cao!'
+        }
+        else if(danger == 'DRY!'){
+            return 'Khô hanh!'
+        }
+        else{
+            return 'Không rõ'
+        }
     }
 }

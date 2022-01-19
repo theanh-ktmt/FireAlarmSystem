@@ -140,7 +140,6 @@ body{
 
 .content-left-env-info-status p span{
     font-size: 16px;
-    color: limegreen;
     font-weight: bold;
     margin-left: 12px;
 }
@@ -170,7 +169,6 @@ body{
 .content-left-control-body p span{
     font-size: 16px;
     font-weight: bold;
-    color: limegreen;
     margin-left: 12px;
 }
 
@@ -215,13 +213,12 @@ body{
     font-size: 14px;
 }
 
-.content-left-analyse-average-header > select{
-    height: 35px;
-    width: 120px;
-    padding: 6px 12px;
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    outline: none;
+.content-left-analyse-average-header > span{
+    margin-left: 12px;
+    font-size: 14px;
+    color: deepskyblue;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 .content-left-analyse-items{

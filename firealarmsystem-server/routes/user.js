@@ -1,5 +1,6 @@
 var database = require('../database')
 var mqttConfig = require('../config.json').MQTTBrokerInfo
+var utils = require('../utils')
 
 module.exports = function(app, mqttClient){
     // Gửi tín hiệu điều khiển
@@ -31,5 +32,148 @@ module.exports = function(app, mqttClient){
         })
 
         res.send('OK')
+    })
+
+    // Đăng nhập vào trang home
+    app.get('/user/:uid/home', function(req, res){
+        const uid = req.params.uid
+
+        // Tạo kết nối tới cơ sở dữ liệu
+        const conn = database.createConnection()
+
+        conn.query(`select * from user where id = ?`, [uid], function(err, results){
+            if(err) throw err
+
+            const userid = results[0].id
+            const username = results[0].name
+            const cardid = results[0].cardid
+
+            // Lấy những dữ liệu khác
+            const queryList = []
+            const date = new Date()
+            const year = date.getFullYear()
+            const month = date.getMonth() + 1
+            const day = date.getDate()
+
+
+            // lấy danh sách dữ liệu mới nhất ngày hôm nay
+            queryList.push(`select * from environment_state where cardid = ${cardid} and thoigian between '${year}-${month}-${day}' and '${year}-${month}-${day} 23:59:59' order by thoigian desc limit 1`) 
+
+            // lấy giá trị trung bình trong ngày
+            
+            queryList.push(`select avg(temperature) as atemp, avg(humidity) as ahumi, avg(fire) as afire, avg(gas) as agas from environment_state where cardid = ${cardid} and thoigian between '${year}-${month}-${day}' and '${year}-${month}-${day} 23:59:59'`) 
+
+            // Lấy trạng thái hiện tại của hệ thống
+            queryList.push(`select * from system_state where cardid = ${cardid}`)
+            conn.query(queryList.join(';'), function(err, results){
+                if(err) throw err
+
+                // Thông số hiện tại
+                var curState = {};
+                
+                if(results[0].length > 0){
+                    curState = {
+                        temperature: results[0][0].temperature.toFixed(2),
+                        humidity: results[0][0].humidity.toFixed(2),
+                        fire: results[0][0].fire,
+                        gas: results[0][0].gas,
+                        warning: utils.warningTranslater(results[0][0].warning)
+                    }
+                }
+                else{
+                    curState = {
+                        temperature: 0.00,
+                        humidity: 0.00,
+                        fire: 0,
+                        gas: 0,
+                        warning: utils.warningTranslater("")
+                    }
+                }
+
+                // Thông số trung bình
+                const avgState = {
+                    temperature: (results[1][0].atemp || 0).toFixed(2),
+                    humidity: (results[1][0].ahumi || 0).toFixed(2),
+                    fire: (results[1][0].afire || 0).toFixed(0),
+                    gas: (results[1][0].agas || 0).toFixed(0)
+                }
+                
+                // Trạng thái hệ thống
+                const system_state = + results[2][0].state
+
+                res.render('home', {
+                    userid: userid,
+                    username: username,
+                    cardid: cardid,
+                    systemState: system_state,
+                    curState: curState,
+                    avgState: avgState
+                })
+
+                conn.end()
+            })
+        })
+    })
+
+    app.get('/user/:uid/updateData', function(req, res){
+        const uid = req.params.uid
+        const cardid = req.query.cardId
+
+        // lấy dữ liệu mới nhất
+
+        // Tạo kết nối tới db
+        const conn = database.createConnection()
+
+        // Lấy những dữ liệu khác
+        const queryList = []
+        const date = new Date()
+        const year = date.getFullYear()
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+
+        // lấy danh sách dữ liệu mới nhất ngày hôm nay
+        queryList.push(`select * from environment_state where cardid = ${cardid} and thoigian between '${year}-${month}-${day}' and '${year}-${month}-${day} 23:59:59' order by thoigian desc limit 10`) 
+
+        // lấy giá trị trung bình trong ngày
+        
+        queryList.push(`select avg(temperature) as atemp, avg(humidity) as ahumi, avg(fire) as afire, avg(gas) as agas from environment_state where cardid = ${cardid} and thoigian between '${year}-${month}-${day}' and '${year}-${month}-${day} 23:59:59'`) 
+
+        // Lấy trạng thái hiện tại của hệ thống
+        queryList.push(`select * from system_state where cardid = ${cardid}`)
+
+        conn.query(queryList.join(';'), function(err, results){
+            if(err) throw err
+
+            // Danh sách 10 dữ liệu mới nhất
+            const latestStateList = []
+            results[0].forEach(function(row) {
+                latestStateList.push({
+                    temperature: row.temperature,
+                    humidity: row.humidity,
+                    fire: row.fire,
+                    gas: row.gas,
+                    thoigian: row.thoigian,
+                    warning: utils.warningTranslater(row.warning)
+                })
+            })
+
+            // Dữ liệu trung bình trong ngày
+            const avgState = {
+                temperature: results[1][0].atemp,
+                humidity: results[1][0].ahumi,
+                fire: results[1][0].afire,
+                gas: results[1][0].agas
+            }
+
+            const systemState = + results[2][0].state
+
+            res.json({
+                latestStateList: latestStateList,
+                avgState: avgState,
+                systemState: systemState
+            })
+            
+            conn.end()
+        })
     })
 }
