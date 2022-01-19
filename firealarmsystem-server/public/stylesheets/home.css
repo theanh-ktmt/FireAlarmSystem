@@ -1,0 +1,355 @@
+html{
+    width: 100%;
+    height: 100%;
+}
+
+body{
+    width: 100%;
+    height: 100%;
+}
+
+.container{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+/* Bên trái */
+
+.content-left{
+    flex: 1;
+    margin: 12px;
+    box-shadow: 1px 1px 5px #ccc;
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-left > div:not(:last-child){
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: solid 1px #ccc;
+}
+
+.content-left > div > h1{
+    font-size: 20px;
+    margin-bottom: 12px;
+    border-left: 4px solid #333;
+    padding-left: 12px;
+}
+
+/* Định dạng phần top */
+
+.content-left-top{
+    flex: 3;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+}
+
+.content-left-logo{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 24px;
+    margin-bottom: 24px;
+}
+
+.content-left-logo img{
+    width: 100%;
+}
+
+.content-left-user-info{
+    flex: 1;
+}
+
+.content-left-user-info h1{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    padding-bottom: 3px;
+    border-bottom: 2px #333 solid;
+    text-align: center;
+}
+
+.content-left-user-info p{
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Định dạng phần thông số môi trường */
+
+.content-left-env-info{
+    flex: 3;
+}
+
+.content-left-env-info-items{
+    justify-content: space-between;
+    padding: 12px 20px;
+}
+
+.content-left-env-info-item{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-left-env-info-item p{
+    font-size: 12px;
+    font-weight: lighter;
+}
+
+.content-left-env-info-item h1{
+    font-size: 24px;
+}
+
+.content-left-env-info-item h1 span{
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.content-left-env-info-status{
+    display: flex;
+    justify-content: left;
+    padding-left: 20px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.content-left-env-info-status p{
+    font-size: 14px;
+}
+
+.content-left-env-info-status p i{
+    color: red;
+    margin-right: 6px;
+}
+
+.content-left-env-info-status p span{
+    font-size: 16px;
+    color: limegreen;
+    font-weight: bold;
+    margin-left: 12px;
+}
+
+/* Định dạng bảng điều khiển */
+
+.content-left-control{
+    flex: 2;
+}
+
+.content-left-control-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+.content-left-control-body p{
+    font-size: 14px;
+}
+
+.content-left-control-body p i {
+    margin-right: 6px;
+    color: limegreen;
+}
+
+.content-left-control-body p span{
+    font-size: 16px;
+    font-weight: bold;
+    color: limegreen;
+    margin-left: 12px;
+}
+
+.content-left-control-body button{
+    height: 35px;
+    padding: 6px 12px;
+    background-color: white;
+    border: 1px solid #aaa;
+    color: #333;
+    transition: all .3s;
+    border-radius: 3px;
+}
+
+.content-left-control-body button:hover{
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+
+.content-left-control-body button i{
+    margin-right: 6px;
+}
+
+.content-left-control-body button:hover i{
+    color: red;
+}
+
+/* Định dạng bảng phân tích */
+
+.content-left-analyse{
+    flex: 2;
+}
+
+.content-left-analyse-average-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+.content-left-analyse-average-header > p{
+    font-size: 14px;
+}
+
+.content-left-analyse-average-header > select{
+    height: 35px;
+    width: 120px;
+    padding: 6px 12px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    outline: none;
+}
+
+.content-left-analyse-items{
+    justify-content: space-between;
+    padding: 12px 20px;
+}
+
+.content-left-analyse-item{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-left-analyse-item p{
+    font-size: 12px;
+    font-weight: lighter;
+}
+
+.content-left-analyse-item h1{
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.content-left-analyse-item h1 span{
+    font-size: 14px;
+    font-weight: normal;
+}
+
+
+/* Định dạng phần bottom */
+
+.content-left-bottom{
+    flex: 1;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    padding-bottom: 2px;
+}
+
+.content-left-bottom button{
+    height: 40px;
+    width: 180px;
+    background-color: white;
+    border: 1px solid #aaa;
+    color: #333;
+    transition: all .3s;
+    border-radius: 3px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-left-bottom button:hover{
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+
+.content-left-bottom button i{
+    margin-right: 8px;
+}
+
+/* Bên phải */
+
+.content-right{
+    flex: 3;
+    margin: 12px;
+    margin-left: 0px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content-right-title{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-right-title h1{
+    font-size: 32px;
+}
+
+.content-right-chart-list{
+    flex: 9;
+}
+
+.content-right-chart-container{
+    width: calc(50% - 6px);
+    height: calc(50% - 6px);
+    background-color: #fefefe;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 1px 1px 5px #ccc;
+}
+
+.content-right-chart-container:nth-child(odd){
+    margin-right: 12px;
+}
+
+.content-right-chart-container:nth-child(n+1):nth-child(-n+2){
+    margin-bottom: 12px;
+}
+
+.content-right-chart-content{
+    flex: 6;
+    padding: 6px;
+}
+
+.content-right-chart-content canvas{
+    width: 100%;
+    height: 100%;
+}
+
+.content-right-chart-title{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-right-chart-title p{
+    font-size: 14px;
+}

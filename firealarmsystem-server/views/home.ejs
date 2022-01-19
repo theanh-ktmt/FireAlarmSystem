@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vn">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="/public/images/favicon.ico">
+  
+  <!-- Import CSS file -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+  <link rel="stylesheet" href="/public/stylesheets/default.css">
+  <link rel="stylesheet" href="/public/stylesheets/home.css">
+
+  <!-- Import JS file -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <script src="/public/javascripts/home.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="content-left">
+                <div class="content-left-top">
+                    <div class="content-left-logo">
+                        <img src="/public/images/popcorn-logo-black.png" alt="Logo">
+                    </div>
+    
+                    <div class="content-left-user-info">
+                        <h1>Trần Thế Anh</h1>
+                        <p>Mã số thẻ: <span style="color: deepskyblue;">12345678</span></p>
+                    </div>
+                </div>
+
+                <div class="content-left-env-info">
+                    <h1>Thông số môi trường</h1>
+                    <div class="content-left-env-info-items row">
+                        <div class="content-left-env-info-item">
+                            <p>Nhiệt độ</p>
+                            <h1>25<span>&ordm;C</span></h1>
+                        </div>
+
+                        <div class="content-left-env-info-item">
+                            <p>Độ ẩm</p>
+                            <h1>70<span>%</span></h1>
+                        </div>
+
+                        <div class="content-left-env-info-item">
+                            <p>Lửa</p>
+                            <h1>0</h1>
+                        </div>
+
+                        <div class="content-left-env-info-item">
+                            <p>Khí gas</p>
+                            <h1>0</h1>
+                        </div>
+                    </div>
+
+                    <div class="content-left-env-info-status">
+                        <p><i class="fas fa-exclamation-circle"></i> Cảnh báo: <span>An toàn</span></p>
+                    </div>
+                </div>
+
+                <div class="content-left-control">
+                    <h1>Bảng điều khiển</h1>
+                    <div class="content-left-control-body">
+                        <p><i class="fas fa-check-circle"></i> Trạng thái: <span>Bật</span></p>
+                        <button><i class="fas fa-power-off"></i> Tắt hệ thống</button>
+                    </div>
+                </div>
+
+                <div class="content-left-analyse">
+                    <h1>Bảng phân tích</h1>
+                    <div class="content-left-analyse-average">
+                        <div class="content-left-analyse-average-header">
+                            <p>Thông số trung bình ngày</p>
+                            <select>
+                                <option value="">18-01-2022</option>
+                                <option value="">17-01-2022</option>
+                                <option value="">16-01-2022</option>
+                                <option value="">15-01-2022</option>
+                                <option value="">14-01-2022</option>
+                            </select>
+                        </div>
+                        
+                        <div class="content-left-analyse-items row">   
+                            <div class="content-left-analyse-item">
+                                <p>Nhiệt độ</p>
+                                <h1>25<span>&ordm;C</span></h1>
+                            </div>
+    
+                            <div class="content-left-analyse-item">
+                                <p>Độ ẩm</p>
+                                <h1>70<span>%</span></h1>
+                            </div>
+    
+                            <div class="content-left-analyse-item">
+                                <p>Lửa</p>
+                                <h1>675</h1>
+                            </div>
+    
+                            <div class="content-left-analyse-item">
+                                <p>Khí gas</p>
+                                <h1>101</h1>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+
+                <div class="content-left-bottom">
+                    <button><i class="fas fa-redo"></i> Làm mới</button>
+                    <button><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                </div>
+            </div>
+            <div class="content-right">
+                <div class="content-right-title">
+                    <h1>Biểu đồ thông tin</h1>
+                </div>
+                <div class="content-right-chart-list row">
+                    <div class="content-right-chart-container">
+                        <div class="content-right-chart-content">
+                            <canvas></canvas>
+                        </div>
+                        <div class="content-right-chart-title">
+                            <p>Biểu đồ nhiệt độ</p>
+                        </div>
+                    </div>
+
+                    <div class="content-right-chart-container">
+                        <div class="content-right-chart-content">
+                            <canvas></canvas>
+                        </div>
+                        <div class="content-right-chart-title">
+                            <p>Biểu đồ độ ẩm</p>
+                        </div>
+                    </div>
+
+                    <div class="content-right-chart-container">
+                        <div class="content-right-chart-content">
+                            <canvas></canvas>
+                        </div>
+                        <div class="content-right-chart-title">
+                            <p>Biểu đồ cảm biến lửa</p>
+                        </div>
+                    </div>
+
+                    <div class="content-right-chart-container">
+                        <div class="content-right-chart-content">
+                            <canvas></canvas>
+                        </div>
+                        <div class="content-right-chart-title">
+                            <p>Biểu đồ cảm biến khí gas</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

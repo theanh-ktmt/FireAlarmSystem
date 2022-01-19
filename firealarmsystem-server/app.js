@@ -1,20 +1,20 @@
 // Import module
-var express = require('express')
-var path = require('path')
-var cookieParser = require('cookie-parser')
-var logger = require('morgan')
-var mqttUtils = require('./mqtt_utils')
-var mqttInfo = require('./config.json').MQTTBrokerInfo
-
-// Import HTTP route
-var indexController = require('./routes/index')
-const userController = require('./routes/user')
+const express = require('express')
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
+const mqttUtils = require('./mqtt_utils')
+const mqttInfo = require('./config.json').MQTTBrokerInfo
 const database = require('./database')
 const utils = require('./utils')
 
+// Import HTTP route
+const indexController = require('./routes/index')
+const userController = require('./routes/user')
+
 // Khởi tạo express
-var app = express()
-var port = process.env.PORT || '9999'
+const app = express()
+const port = process.env.PORT || '9999'
 
 // Tạo MQTT Client
 const mqttClient = mqttUtils.getMQTTClient()
@@ -28,7 +28,7 @@ app.use(logger('tiny'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(express.static(path.join(__dirname, 'public')))
+app.use('/public', express.static(path.join(__dirname, 'public')))
 
 // HTTP route
 indexController(app, mqttClient)

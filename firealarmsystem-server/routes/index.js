@@ -2,24 +2,28 @@
 var database = require('../database')
 var utils = require('../utils')
 
-module.exports = function(app, mqttClient){
+module.exports = function (app, mqttClient) {
 
-    // ---------------------- Phía Website ------------------------------- //
+  // ---------------------- Phía Website ------------------------------- //
 
   // home page web
-  app.get('/', function(req, res, next) {
-    res.render('index', { title: 'Express' });
+  app.get('/', function (req, res, next) {
+    res.render('index');
+  })
+
+  app.get('/home', function (req, res) {
+    res.render('home')
   })
 
   // Đăng nhập trên web
-  app.post('/loginFromWeb', function(req, res){
+  app.post('/loginFromWeb', function (req, res) {
     // Dữ liệu gửi lên
     const username = req.body.username
     const password = req.body.password
 
     // Truy vấn cơ sở dữ liệu
     const conn = database.createConnection()
-    
+
     // ... Truy vấn
 
     conn.end()
@@ -27,14 +31,14 @@ module.exports = function(app, mqttClient){
     res.send({
       status: 'success',
       message: 'Đăng nhập thành công',
-      userInfo:{
+      userInfo: {
         name: "Tran The Anh"
       }
     })
   })
 
   // Đăng ký User trên web
-  app.post('/register', function(req, res){
+  app.post('/register', function (req, res) {
     // Thông tin người dùng
     const username = req.body.username
     const password = req.body.password
@@ -55,7 +59,7 @@ module.exports = function(app, mqttClient){
   // ---------------------- Phía phần cứng ------------------------------- //
 
   // Đăng nhập bằng thẻ từ
-  app.post('/loginFromHome', function(req, res){
+  app.post('/loginFromHome', function (req, res) {
     // Dữ liệu gửi lên từ nhà (mã số của thẻ Mifare)
     const mifareCode = req.body.code;
     console.log("A user is logging in with code: ", mifareCode);
@@ -63,11 +67,11 @@ module.exports = function(app, mqttClient){
     // Truy vấn cơ sở dữ liệu
     const conn = database.createConnection()
 
-    conn.query('select name FROM user where cardid = ?;', [mifareCode], function(err, results){
-      if(err) throw err
-      
+    conn.query('select name FROM user where cardid = ?;', [mifareCode], function (err, results) {
+      if (err) throw err
+
       // Đăng nhập thành công
-      if(results.length > 0){
+      if (results.length > 0) {
         res.send({
           status: 'success',
           message: "Login successfully!",
@@ -78,7 +82,7 @@ module.exports = function(app, mqttClient){
       }
 
       // Đăng nhập thất bại
-      else{
+      else {
         res.send({
           status: 'fail',
           message: "Card ID not exist!",
