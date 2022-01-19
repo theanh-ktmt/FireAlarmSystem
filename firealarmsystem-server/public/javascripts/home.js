@@ -102,10 +102,17 @@ function updateData(tempChart, humiChart, fireChart, gasChart){
                     newGas.push(state.gas.toFixed(0))
                 })
 
-                updateChart(tempChart, newTimeSeries.reverse(), newTemp.reverse())
-                updateChart(humiChart, newTimeSeries.reverse(), newHumi.reverse())
-                updateChart(fireChart, newTimeSeries.reverse(), newFire.reverse())
-                updateChart(gasChart, newTimeSeries.reverse(), newGas.reverse())
+                // Reverse
+                newTimeSeries.reverse()
+                newTemp.reverse()
+                newHumi.reverse()
+                newFire.reverse()
+                newGas.reverse()
+
+                updateChart(tempChart, newTimeSeries, newTemp)
+                updateChart(humiChart, newTimeSeries, newHumi)
+                updateChart(fireChart, newTimeSeries, newFire)
+                updateChart(gasChart, newTimeSeries, newGas)
             }
             else{
                 return
