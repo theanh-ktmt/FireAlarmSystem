@@ -242,3 +242,34 @@ section {
   border-color: white;
   color: white;
 }
+
+/* Responsive cho điện thoại */
+@media only screen and (max-width: 600px){
+  .container{
+    width: 360px;
+  }
+
+  .content-left-login{
+    padding: 0px 12px;
+  }
+
+  .content-left-login-body-item p{
+    font-size: 14px;
+  }
+
+  .content-left-login-body-item input{
+    width: 160px;
+  }
+
+  .content-right-register{
+    padding: 0px 12px;
+  }
+
+  .content-right-register-body-item p{
+    font-size: 14px;
+  }
+
+  .content-right-register-body-item input{
+    width: 160px;
+  }
+}

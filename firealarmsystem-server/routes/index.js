@@ -59,6 +59,7 @@ module.exports = function (app, mqttClient) {
     const password = req.body.password
     const cardid = utils.hexDecoder(req.body.cardid)
     const name = req.body.name
+    const email = req.body.email
 
     // Kiểm tra thông tin người dùng
     const conn = database.createConnection()
@@ -79,7 +80,7 @@ module.exports = function (app, mqttClient) {
       // Tài khoản chưa tồn tại
       else{
         // Thêm tài khoản vào cơ sỏ dữ liệu
-        conn.query('insert into user(username, password, name, cardid) values (?, ?, ?, ?)', [username, password, name, cardid], function(err, results){
+        conn.query('insert into user(username, password, name, cardid, email) values (?, ?, ?, ?, ?)', [username, password, name, cardid, email], function(err, results){
           if(err) throw err
 
           res.send({

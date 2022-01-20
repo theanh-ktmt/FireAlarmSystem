@@ -12,5 +12,10 @@
         "dataTopic": "popcorn_mqtt_fas_data",
         "commandTopic": "popcorn_mqtt_fas_command",
         "stateTopic": "popcorn_mqtt_fas_state"
+    },
+    "mailInfo": {
+        "service": "gmail",
+        "user": "popcorn.firealarmsystem@gmail.com",
+        "pass": "Abc123mnpq@"
     }
 }

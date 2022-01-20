@@ -45,5 +45,11 @@ module.exports = {
         else{
             return 'Không rõ'
         }
+    },
+    getYesterday: function(today){
+        return new Date(new Date().getTime() - 24*60*60*1000);
+    },
+    formatDate: function(date){
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
     }
 }

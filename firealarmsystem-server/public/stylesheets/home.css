@@ -350,3 +350,29 @@ body{
 .content-right-chart-title p{
     font-size: 14px;
 }
+
+@media only screen and (max-width: 600px){
+    .content-right{
+        display: none;
+    }
+
+    .content-left > div > h1{
+        font-size: 18px;
+    }
+
+    .content-left-env-info-item h1{
+        font-size: 20px;
+    }
+
+    .content-left-env-info-item h1 span{
+        font-size: 12px;
+    }
+
+    .content-left-analyse-item h1{
+        font-size: 20px;
+    }
+
+    .content-left-analyse-item h1 span{
+        font-size: 12px;
+    }
+}

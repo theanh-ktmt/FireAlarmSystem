@@ -36,7 +36,7 @@ const char* ssid = "The Anh";
 const char* password = "theanhbeo372000";
 
 // Địa chỉ Server
-String serverAddr = "http://171.245.27.199:9999";
+String serverAddr = "http://171.245.18.199:9999";
 
 // Địa chỉ MQTT Broker
 String mqtt_server = "broker.hivemq.com";

@@ -1,6 +1,7 @@
 var database = require('../database')
 var mqttConfig = require('../config.json').MQTTBrokerInfo
 var utils = require('../utils')
+var mailer = require('../mailer')
 
 module.exports = function(app, mqttClient){
     // Gửi tín hiệu điều khiển
@@ -14,24 +15,36 @@ module.exports = function(app, mqttClient){
         const conn = database.createConnection()
     
         // Truy xuất để lấy thông tin card code của user
-    
-        conn.end()
-    
-        // gửi tín hiệu điều khiển lên topic điều khiển
-        const command = {}
-        command['type'] = 'control'
-        command['cardid'] = cardCode
-        command['state'] = state
-    
-        mqttClient.publish(mqttConfig.commandTopic, JSON.stringify(command), {qos: 0, retain: false}, (error) => {
-        if(error){
-            console.error(error)
-        }
-    
-        console.log(`Send command to topic ${mqttConfig.commandTopic}\n\t- Card code: \t${cardCode}\n\t- Command: \t${state == 1? 'On' : 'Off'}\n`);
-        })
+        conn.query('select * from user where id = ?', [userid], function(err, results){
+            if(err) return err
+            
+            // tồn tại card id
+            if(results.length > 0){
+                cardCode = results[0].cardid
+                console.log(results[0].cardid);
 
-        res.send('OK')
+                // gửi tín hiệu điều khiển lên topic điều khiển
+                const command = {}
+                command['type'] = 'control'
+                command['cardid'] = cardCode
+                command['state'] = state
+            
+                mqttClient.publish(mqttConfig.commandTopic, JSON.stringify(command), {qos: 0, retain: false}, (error) => {
+                if(error){
+                    console.error(error)
+                }
+            
+                console.log(`Send command to topic ${mqttConfig.commandTopic}\n\t- Card code: \t${cardCode}\n\t- Command: \t${state == 1? 'On' : 'Off'}\n`);
+                })
+
+                res.send('success')
+                conn.end()
+            }
+            else{
+                res.send('fail')
+                conn.end()
+            }
+        })
     })
 
     // Đăng nhập vào trang home
@@ -82,8 +95,8 @@ module.exports = function(app, mqttClient){
                 }
                 else{
                     curState = {
-                        temperature: 0.00,
-                        humidity: 0.00,
+                        temperature: 0,
+                        humidity: 0,
                         fire: 0,
                         gas: 0,
                         warning: utils.warningTranslater("")
@@ -141,6 +154,9 @@ module.exports = function(app, mqttClient){
         // Lấy trạng thái hiện tại của hệ thống
         queryList.push(`select * from system_state where cardid = ${cardid}`)
 
+        // Lấy thông tin user
+        queryList.push(`select * from user where id = ${uid}`)
+
         conn.query(queryList.join(';'), function(err, results){
             if(err) throw err
 
@@ -157,6 +173,46 @@ module.exports = function(app, mqttClient){
                 })
             })
 
+            // Kiểm tra trạng thái
+            const curWarning = latestStateList[0].warning
+
+            // có nguy hiểm
+            if(curWarning != 'Không rõ' && curWarning != 'An toàn'){
+                console.log('Có nguy hiểm!!!');
+                // Kiểm tra lần cảnh báo cuối
+                // Thời gian update gần đây nhất
+                const lastAnnounce = new Date(results[3][0].lastannounce)
+                const curTime = new Date()
+
+                const timeStampInMinute = 15 // 15p cập nhật 1 lần
+                const timeStampInMillis = timeStampInMinute * 60 * 1000
+
+                // đủ thời gian
+                if(curTime - lastAnnounce > timeStampInMillis){
+                    // Cảnh báo
+                    const email = results[3][0].email
+                    const str = `Chúng tôi đã phát hiện những thông số bất thường trong căn nhà của bạn.\nKết quả dự đoán: ${curWarning}\n\nBạn hãy quay về trang web để theo dõi thông tin chi tiết.\nTrân trọng,\nPopcorn`
+                    mailer.sendMail(email, "Popcorn: WARNING!!!", str, function(err, info){
+                        if(err) throw err
+                    
+                        console.log('Send mail: ', info.response);
+                    })
+
+                    console.log("Cảnh báo người dùng");
+
+                    // Cập nhật lại thời gian
+                    const updateConn = database.createConnection()
+
+                    updateConn.query('update user set lastannounce = "?-?-? ?:?:?" where id = ?', [curTime.getFullYear(), curTime.getMonth() + 1, curTime.getDate(), curTime.getHours(), curTime.getMinutes(), curTime.getSeconds(), uid], function(err, results){
+                        if(err) throw err
+
+                        console.log("Cập nhật thời gian thông báo thành công");
+
+                        updateConn.end()
+                    })
+                }
+            }
+
             // Dữ liệu trung bình trong ngày
             const avgState = {
                 temperature: results[1][0].atemp,
@@ -165,6 +221,7 @@ module.exports = function(app, mqttClient){
                 gas: results[1][0].agas
             }
 
+            // Trạng thái hiện tại của hệ thống
             const systemState = + results[2][0].state
 
             res.json({
@@ -173,6 +230,23 @@ module.exports = function(app, mqttClient){
                 systemState: systemState
             })
             
+            conn.end()
+        })
+    })
+
+    // Cập nhật thời gian update
+    app.get('/user/:uid/updateLastAnnounce', function(req, res){
+        const newTime = new Date(req.query.newTime)
+        const uid = req.params.uid
+
+        // Tạo kết nối database
+        const conn = database.createConnection()
+
+        conn.query('update user set lastannounce = "?-?-? ?:?:?" where id = ?', [newTime.getFullYear(), newTime.getMonth + 1, newTime.getDate(), newTime.getHours(), newTime.getMinutes(), newTime.getSeconds(), uid], function(err, results){
+            if(err) throw err
+
+            console.log("Cập nhật thời gian thành công");
+            res.send('OK')
             conn.end()
         })
     })

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Dữ liệu
+    // Dữ liệu khởi tạo
     var xLabels = ['12:00:05', '12:00:10', '12:00:15', '12:00:20', '12:00:25', '12:00:30']
     var yValues = [24, 25, 28, 29, 18, 30]
     
@@ -167,7 +167,7 @@ function turnOn(){
     const xhttp = new XMLHttpRequest()
     xhttp.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
-            console.log('Turn on success');
+            console.log('Turn on' + this.responseText);
         }
     }
 
@@ -189,7 +189,7 @@ function turnOff(){
     const xhttp = new XMLHttpRequest()
     xhttp.onreadystatechange = function(){
         if(this.readyState == 4 && this.status == 200){
-            console.log('Turn off success');
+            console.log('Turn off' + this.responseText);
         }
     }
 

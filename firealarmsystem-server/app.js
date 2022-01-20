@@ -3,6 +3,7 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
+const cron = require('node-cron')
 const mqttUtils = require('./mqtt_utils')
 const mqttInfo = require('./config.json').MQTTBrokerInfo
 const database = require('./database')
@@ -125,7 +126,8 @@ mqttClient.on('message', function(topic, payload){
     // trạng thái mới của hệ thống
     const newState = data.state
     const cardid = + data.cardid
-
+    console.log(cardid, newState);
+    
     // Tạo kết nối CSDL
     const conn = database.createConnection()
     conn.query(`update system_state set state = ? where cardid = ?`, [newState, cardid], function(err, results){
@@ -136,6 +138,25 @@ mqttClient.on('message', function(topic, payload){
     })
   }
 })
+
+// Đặt lịch xóa dữ liệu ngày hôm trước vào đúng 0h sáng mỗi ngày
+var task = cron.schedule('0 0 * * *', () =>  {
+  const today = new Date()
+  const yesterday = utils.getYesterday(today) 
+  // Tạo kết nối cơ sở dữ liệu
+  const conn = database.createConnection()
+
+  conn.query("delete from environment_state where thoigian between '?-?-?' and '?-?-? 23:59:59'", [yesterday.getFullYear(), yesterday.getMonth() + 1, yesterday.getDate(), yesterday.getFullYear(), yesterday.getMonth() + 1, yesterday.getDate()], function(err, results){
+    if(err) throw err
+    console.log(`Delete data: ${utils.formatDate(yesterday)}`);
+
+    conn.end()
+  })
+}, {
+  scheduled: false
+});
+
+task.start()
 
 app.listen(port, function(){
   console.log(`Listening on port ${port}`);

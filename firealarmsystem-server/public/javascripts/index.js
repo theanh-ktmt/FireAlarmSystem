@@ -69,11 +69,12 @@ function register(){
     const password2 = document.querySelector('.register-password-2').value
     const cardid = document.querySelector('.register-card-id').value
     const name = document.querySelector('.register-name').value
+    const email = document.querySelector('.register-email').value
     const announce = document.querySelector('.register-announce')
 
-    console.log(username, password1, password2, cardid)
+    console.log(username, password1, password2, cardid, email)
 
-    if(!username || !password1 || !password2 || !cardid || !name){
+    if(!username || !password1 || !password2 || !cardid || !name || !email){
         announce.innerHTML = 'Bạn cần nhập đủ các trường dữ liệu để đăng ký'       
     }
     else{
@@ -100,7 +101,7 @@ function register(){
 
             xhttp.open('POST', '/register', true)
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhttp.send(`username=${username}&password=${password1}&cardid=${cardid}&name=${name}`)
+            xhttp.send(`username=${username}&password=${password1}&cardid=${cardid}&name=${name}&email=${email}`)
         }
     }
 }
