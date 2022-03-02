@@ -10,3 +10,5 @@ Server của Hệ thống chống cháy thông minh do nhóm Popcorn thực hi�
 # Cấu trúc thư mục
 - esp32: Chứa file code (.ino) cho ESP32
 - firealarmsystem-server: Chứa code (NodeJS) cho server của hệ thống
+
+# Demo: [Link](https://drive.google.com/file/d/1i9UjTVdQVobQBIWZr-lVTKfNG873nkbA/view?usp=sharing)
